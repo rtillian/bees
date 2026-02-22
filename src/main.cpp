@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <FirebaseClient.h>
+#include <FirebaseJson.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME680.h>
@@ -102,10 +104,14 @@ HX711 loadcell;
 TinyGPSPlus gps;
 HardwareSerial GPSSerial(2); // Use UART2
 
-// Firebase Objects
-FirebaseData fbdo;
-FirebaseAuth auth;
-FirebaseConfig config;
+// Firebase Objects (new FirebaseClient library)
+WiFiClientSecure ssl_client;
+using AsyncClient = AsyncClientClass;
+AsyncClient aClient(ssl_client);
+NoAuth noAuth;
+FirebaseApp app;
+RealtimeDatabase Database;
+AsyncResult dbResult;
 bool firebaseConnected = false;
 
 // Global Variables for Sensors
@@ -235,6 +241,7 @@ float calculateBatteryPercentage(float voltage);
 bool firebaseSetJSON(const String& path, FirebaseJson& json, int maxRetries = FIREBASE_MAX_RETRIES);
 bool firebaseUpdateNode(const String& path, FirebaseJson& json, int maxRetries = FIREBASE_MAX_RETRIES);
 bool firebasePushJSON(const String& path, FirebaseJson& json, int maxRetries = FIREBASE_MAX_RETRIES);
+bool firebaseGetJSON(const String& path, FirebaseJson& result);
 void testAllSensors();
 void handleSerialCommands();
 
@@ -297,6 +304,9 @@ void setup() {
 void loop() {
   // Feed the watchdog
   feedWatchdog();
+  
+  // Maintain Firebase authentication
+  app.loop();
   
   // Update system uptime
   if (millis() - systemState.lastUptimeUpdate >= 60000) {  // Every minute
@@ -390,7 +400,13 @@ void loop() {
 }
 
 void setupWatchdog() {
-  esp_task_wdt_init(WDT_TIMEOUT, true);  // Enable panic on timeout
+  // ESP-IDF v5.x / Arduino-ESP32 core v3.x uses config struct
+  esp_task_wdt_config_t wdt_config = {
+    .timeout_ms = WDT_TIMEOUT * 1000,
+    .idle_core_mask = 0,
+    .trigger_panic = true
+  };
+  esp_task_wdt_init(&wdt_config);
   esp_task_wdt_add(NULL);  // Add current thread to WDT watch
   Serial.println("Watchdog initialized");
 }
@@ -528,15 +544,29 @@ void setupGPS() {
 void setupFirebase() {
   Serial.print("Connecting to Firebase... ");
   
-  config.api_key = API_KEY;
-  config.database_url = DATABASE_URL;
-  config.token_status_callback = tokenStatusCallback;
+  // Configure SSL client
+  ssl_client.setInsecure(); // Skip certificate verification for simplicity
+  ssl_client.setConnectionTimeout(1000);
+  ssl_client.setHandshakeTimeout(5);
   
-  if (Firebase.signUp(&config, &auth, "", "")) {
+  // Initialize Firebase app with no auth (anonymous access)
+  initializeApp(aClient, app, getAuth(noAuth), dbResult);
+  
+  // Wait for authentication to complete (with timeout)
+  unsigned long authStart = millis();
+  while (app.isInitialized() && !app.ready() && millis() - authStart < 10000) {
+    app.loop();
+    delay(100);
+    feedWatchdog();
+  }
+  
+  if (app.ready()) {
+    // Bind the RealtimeDatabase service to the app
+    app.getApp<RealtimeDatabase>(Database);
+    Database.url(DATABASE_URL);
+    
     Serial.println("Success!");
     firebaseConnected = true;
-    Firebase.begin(&config, &auth);
-    Firebase.reconnectWiFi(true);
   } else {
     Serial.println("Failed! Check credentials.");
     firebaseConnected = false;
@@ -1139,7 +1169,7 @@ void uploadBME680Data() {
     
     // Calculate and update daily averages
     String dailyAvgPath = "environment/history/" + String(datePath) + "/daily_average";
-    Firebase.RTDB.getJSON(&fbdo, dailyAvgPath);
+    FirebaseJson existingAvg;
     
     FirebaseJson avgJson;
     FirebaseJsonData result;
@@ -1150,20 +1180,20 @@ void uploadBME680Data() {
     float gasSum = bmeData.gas_resistance;
     int count = 1;
     
-    if (fbdo.httpCode() == 200) {
-      if (fbdo.jsonObject().get(result, "count")) {
+    if (firebaseGetJSON(dailyAvgPath, existingAvg)) {
+      if (existingAvg.get(result, "count")) {
         count = result.to<int>() + 1;
         
-        fbdo.jsonObject().get(result, "temp");
+        existingAvg.get(result, "temp");
         tempSum += result.to<float>() * (count - 1);
         
-        fbdo.jsonObject().get(result, "humidity");
+        existingAvg.get(result, "humidity");
         humSum += result.to<float>() * (count - 1);
         
-        fbdo.jsonObject().get(result, "pressure");
+        existingAvg.get(result, "pressure");
         presSum += result.to<float>() * (count - 1);
         
-        fbdo.jsonObject().get(result, "gas_resistance");
+        existingAvg.get(result, "gas_resistance");
         gasSum += result.to<float>() * (count - 1);
       }
     }
@@ -1346,26 +1376,26 @@ void updateSystemStatus() {
     String historyPath = "system/power/history/" + String(datePath);
     
     // Get existing power history or create new
-    Firebase.RTDB.getJSON(&fbdo, historyPath);
+    FirebaseJson existingHistory;
     
     FirebaseJson historyJson;
-    if (fbdo.httpCode() == 200) {
+    if (firebaseGetJSON(historyPath, existingHistory)) {
       FirebaseJsonData data;
       
       float minV = batteryData.voltage;
-      fbdo.jsonObject().get(data, "min_voltage");
+      existingHistory.get(data, "min_voltage");
       if (data.success) minV = min(minV, data.to<float>());
       
       float maxV = batteryData.voltage;
-      fbdo.jsonObject().get(data, "max_voltage");
+      existingHistory.get(data, "max_voltage");
       if (data.success) maxV = max(maxV, data.to<float>());
       
       float sum = batteryData.voltage;
       int count = 1;
-      fbdo.jsonObject().get(data, "sum");
+      existingHistory.get(data, "sum");
       if (data.success) sum += data.to<float>();
       
-      fbdo.jsonObject().get(data, "count");
+      existingHistory.get(data, "count");
       if (data.success) count += data.to<int>();
       
       historyJson.set("min_voltage", minV);
@@ -1607,17 +1637,19 @@ void calibrateIRSensors() {
 }
 
 bool firebaseSetJSON(const String& path, FirebaseJson& json, int maxRetries) {
-  if (!firebaseConnected) return false;
+  if (!firebaseConnected || !app.ready()) return false;
   
   bool success = false;
   int attempts = 0;
+  String fullPath = "smart-beehive/" + path;
   
   while (!success && attempts < maxRetries) {
-    if (Firebase.RTDB.setJSON(&fbdo, path, &json)) {
+    Database.set<object_t>(aClient, fullPath, object_t(json.raw()));
+    if (aClient.lastError().code() == 0) {
       success = true;
     } else {
       Serial.printf("Firebase setJSON failed: %s, attempt %d/%d\n", 
-                   fbdo.errorReason().c_str(), attempts + 1, maxRetries);
+                   aClient.lastError().message().c_str(), attempts + 1, maxRetries);
       attempts++;
       delay(FIREBASE_RETRY_INTERVAL);
     }
@@ -1627,17 +1659,19 @@ bool firebaseSetJSON(const String& path, FirebaseJson& json, int maxRetries) {
 }
 
 bool firebaseUpdateNode(const String& path, FirebaseJson& json, int maxRetries) {
-  if (!firebaseConnected) return false;
+  if (!firebaseConnected || !app.ready()) return false;
   
   bool success = false;
   int attempts = 0;
+  String fullPath = "smart-beehive/" + path;
   
   while (!success && attempts < maxRetries) {
-    if (Firebase.RTDB.updateNode(&fbdo, path, &json)) {
+    Database.update<object_t>(aClient, fullPath, object_t(json.raw()));
+    if (aClient.lastError().code() == 0) {
       success = true;
     } else {
       Serial.printf("Firebase updateNode failed: %s, attempt %d/%d\n", 
-                   fbdo.errorReason().c_str(), attempts + 1, maxRetries);
+                   aClient.lastError().message().c_str(), attempts + 1, maxRetries);
       attempts++;
       delay(FIREBASE_RETRY_INTERVAL);
     }
@@ -1647,23 +1681,39 @@ bool firebaseUpdateNode(const String& path, FirebaseJson& json, int maxRetries) 
 }
 
 bool firebasePushJSON(const String& path, FirebaseJson& json, int maxRetries) {
-  if (!firebaseConnected) return false;
+  if (!firebaseConnected || !app.ready()) return false;
   
   bool success = false;
   int attempts = 0;
+  String fullPath = "smart-beehive/" + path;
   
   while (!success && attempts < maxRetries) {
-    if (Firebase.RTDB.pushJSON(&fbdo, path, &json)) {
+    Database.push<object_t>(aClient, fullPath, object_t(json.raw()));
+    if (aClient.lastError().code() == 0) {
       success = true;
     } else {
       Serial.printf("Firebase pushJSON failed: %s, attempt %d/%d\n", 
-                   fbdo.errorReason().c_str(), attempts + 1, maxRetries);
+                   aClient.lastError().message().c_str(), attempts + 1, maxRetries);
       attempts++;
       delay(FIREBASE_RETRY_INTERVAL);
     }
   }
   
   return success;
+}
+
+bool firebaseGetJSON(const String& path, FirebaseJson& result) {
+  if (!firebaseConnected || !app.ready()) return false;
+  
+  String fullPath = "smart-beehive/" + path;
+  String payload = Database.get<String>(aClient, fullPath);
+  
+  if (aClient.lastError().code() == 0 && payload.length() > 0 && payload != "null") {
+    result.setJsonData(payload);
+    return true;
+  }
+  
+  return false;
 }
 
 void printSystemStatus() {

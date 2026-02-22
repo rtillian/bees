@@ -238,3 +238,6 @@ For secured dashboards:
 1. Connection Issues: Verify API key and Database URL are correct
 2. Permission Denied: Check security rules configuration
 3. Data Not Appearing: Verify WiFi connection on ESP32 and check serial output for errors
+4. Library Version: This project uses `mobizt/FirebaseClient` (the new async library).
+   The older `mobizt/Firebase ESP Client` library is deprecated and NOT compatible.
+   Ensure PlatformIO resolves `mobizt/FirebaseClient @ ^2.1.5` and `mobizt/FirebaseJson`.
