@@ -13,7 +13,8 @@ void DataBuffer::addData(
         long frequency,
         unsigned long beeCountIn, 
         unsigned long beeCountOut 
-    ) {
+) 
+{
     
     if (recordCount >= MAX_RECORDS) {
         // Ringbuffer: älteste Einträge überschreiben
@@ -49,19 +50,22 @@ bool DataBuffer::uploadBuffer(SupabaseClient& supabase) {
     Serial.printf("Sende %d Datensätze an Supabase (sensor_data)...\n", recordCount);
 
     bool success = true;
-
+    String beeStation = "abc";
+    unsigned long beeCountIn;
+    unsigned long beeCountOut;
     for (int i = 0; i < recordCount; i++) {
         if (!supabase.sendData(
-            
-                records[i].dB,
-                records[i].frequency,
-                records[i].beeCountIn,
-                records[i].beeCountOut,
+ 
+                records[i].beeStation,
+                records[i].boxNumber,
                 records[i].temperature,
                 records[i].humidity,
                 records[i].co2,
-                beeStation,      // aus der Station-Info
-                boxNumber)
+                records[i].db,
+                records[i].frequency,
+                beeCountIn,
+                beeCountOut
+            )
             ) {    // aus der Station-Info
             success = false;
         }
@@ -123,4 +127,7 @@ bool DataBuffer::checkAndLoadStationInfo(SupabaseClient& supabase) {
     else if (httpCode == 404 || httpCode == 406) {
         Serial.println("MAC-Adresse nicht in Tabelle 'locations' gefunden.");
     }
+    return false;
 }
+
+

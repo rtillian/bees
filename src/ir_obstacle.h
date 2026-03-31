@@ -8,7 +8,8 @@ public:
     IRObstacle(uint8_t pin);
     void begin();
     void update();
-    long getCount() const;
+    long getCountIn() const;
+    long getCountOut() const;
     void resetCount();
 
 private:

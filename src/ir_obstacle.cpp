@@ -25,10 +25,12 @@ void IRObstacle::update() {
     _lastState = currentState;
 }
 
-long IRObstacle::getCount() const {
+long IRObstacle::getCountIn() const {
     return _count;
 }
-
+long IRObstacle::getCountOut() const {
+    return _count;
+}
 void IRObstacle::resetCount() {
     _count = 0;
 }

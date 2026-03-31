@@ -43,7 +43,6 @@ private:
     static constexpr int MAX_RECORDS = 60;
     SensorRecord records[MAX_RECORDS];
     int recordCount = 0;
-
  
     bool stationInfoLoaded = false;
 
