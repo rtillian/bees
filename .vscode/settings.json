@@ -1,0 +1,35 @@
+{
+    "C_Cpp.default.configurationProvider": "ms-vscode.cpptools",
+    "C_Cpp.intelliSenseEngine": "Default",
+
+    // Arduino-String bevorzugen, MB_String ignorieren
+    "C_Cpp.files.exclude": {
+        "**/MB_String.h": true,
+        "**/MB_String.cpp": true
+    },
+
+    // PlatformIO-IntelliSense stabilisieren
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/.pio/libdeps/${config:platformio-ide.defaultEnv}/**",
+        "${workspaceFolder}/.pio/packages/framework-arduinoespressif32/**"
+    ],
+
+    // Wichtige Defines für Arduino
+    "C_Cpp.default.defines": [
+        "ARDUINO=100",
+        "ESP32",
+        "CORE_DEBUG_LEVEL=0"
+    ],
+
+    // IntelliSense sauber halten
+    "files.associations": {
+        "*.tcc": "cpp",
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
+    }
+}
+
