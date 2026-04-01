@@ -1,4 +1,4 @@
-#include "inmp441_mic.h"
+#include "inmp441_mic_real.h"
 
 INMP441Mic::INMP441Mic() : FFT(vReal, vImag, BUFFER_SIZE, 22050) {}
 

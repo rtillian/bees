@@ -1,10 +1,12 @@
 #include <Arduino.h>
+//#include "inmp441_mic.h"
 #include "inmp441_mic.h"
 #include "ir_obstacle.h"
 #include "myUtils.h"
 #include "supabase_client.h"
 #include "data_buffer.h"
 
+//INMP441Mic mic;
 INMP441Mic mic;
 IRObstacle irSensor(26);
 MyUtils utils;
@@ -21,6 +23,12 @@ unsigned long lastUploadTime = 0;
 void setup() {
     Serial.begin(115200);
     delay(1000);
+    #if MIC_IS_SIMULATION
+        Serial.println("→ INMP441 läuft im Simulations-Modus (Pseudo-Werte)");
+    #else
+        Serial.println("→ INMP441 läuft mit echter Hardware");
+    #endif
+    delay(5000);
     
     Serial.println("\n========================================");
     Serial.println("   INMP441 + IR Bienenzähler + Supabase");
