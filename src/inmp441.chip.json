@@ -1,0 +1,24 @@
+{
+  "name": "INMP441",
+  "version": "1.0",
+  "author": "Dein Name",
+  "description": "Simplified INMP441 I2S Microphone with volume slider",
+  "pins": [
+    { "name": "VCC", "type": "power" },
+    { "name": "GND", "type": "power" },
+    { "name": "WS",  "type": "input" },
+    { "name": "SCK", "type": "input" },
+    { "name": "SD",  "type": "output" },
+    { "name": "L/R", "type": "input" }
+  ],
+  "controls": [
+    {
+      "id": "volume",
+      "type": "slider",
+      "label": "Volume / Loudness",
+      "min": 0,
+      "max": 4095,
+      "default": 2048
+    }
+  ]
+}

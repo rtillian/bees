@@ -80,7 +80,7 @@ void loop() {
     }
 
     // Alle 10 Minuten Puffer an Supabase senden
-    if (now - lastUploadTime >= 10000) { //600000) {        // 10 Minuten
+    if (now - lastUploadTime >= 600000) { //600000) {        // 10 Minuten
         Serial.println("--- Starte Upload an Supabase (sensor_data) ---");
         dataBuffer.uploadBuffer(supabase);
         lastUploadTime = now;
