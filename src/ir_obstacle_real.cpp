@@ -1,4 +1,4 @@
-#include "ir_obstacle.h"
+#include "ir_obstacle_real.h"
 
 IRObstacle::IRObstacle(uint8_t pin) : _pin(pin) {}
 

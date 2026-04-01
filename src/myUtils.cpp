@@ -29,8 +29,8 @@ String MyUtils::getDeviceID() {
 
 void MyUtils::printDeviceInfo() {
     Serial.println("\n=== Geräte-Informationen ===");
-    Serial.printf("MAC-Adresse: %s\n", getDeviceID().c_str());
-    Serial.printf("ESP32 Chip ID: %08X\n", (uint32_t)ESP.getEfuseMac());
-    Serial.printf("CPU-Frequenz: %d MHz\n", ESP.getCpuFreqMHz());
+    Serial.printf("MAC-Adresse: %s\r\n", getDeviceID().c_str());
+    Serial.printf("ESP32 Chip ID: %08X\r\n", (uint32_t)ESP.getEfuseMac());
+    Serial.printf("CPU-Frequenz: %d MHz\r\n", ESP.getCpuFreqMHz());
     Serial.println("===========================\n");
 }

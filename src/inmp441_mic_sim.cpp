@@ -20,7 +20,7 @@ void INMP441Mic_sim::update() {
     // Lautstärke-Timer aktualisieren
     if (now - lastLoudnessTime >= LOUDNESS_INTERVAL) {
         lastLoudnessTime = now;
-        Serial.println("Pseudo - update");
+        Serial.println("Pseudo - update inmp441_mic_sim.cpp");
     }
 }
 

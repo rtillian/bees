@@ -1,23 +1,9 @@
-#ifndef IR_OBSTACLE_H
-#define IR_OBSTACLE_H
-
-#include <Arduino.h>
-
-class IRObstacle {
-public:
-    IRObstacle(uint8_t pin);
-    void begin();
-    void update();
-    long getCountIn() const;
-    long getCountOut() const;
-    void resetCount();
-
-private:
-    uint8_t _pin;
-    long _count = 0;
-    bool _lastState = HIGH;
-    unsigned long _lastDetectionTime = 0;
-    const unsigned long _minGap = 30;     // ← Hier kannst du einstellen!
-};
-
+#ifdef SIMULATION
+    #include "ir_obstacle_sim.h"
+    using IRObstacle = IRObstacle_sim;      // Simulations-Version
+    #define MIC_IS_SIMULATION 1
+#else
+    #include "ir_obstacle_real.h"
+    using IRObstacle = IRObstacle;      // Simulations-Version
+    #define MIC_IS_SIMULATION 0
 #endif

@@ -4,33 +4,46 @@ SupabaseClient::SupabaseClient() {}
 
 bool SupabaseClient::begin(const char* ssid, const char* password) {
     WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
 
-    Serial.print("Verbinde mit WiFi: ");
+#ifdef SIMULATION
+    // ====================== WOKWI SIMULATION ======================
+    Serial.println("→ Simulation: Verbinde mit Wokwi-GUEST");
+    WiFi.begin("Wokwi-GUEST", "", 6);        // Channel 6 = schneller
+#else
+    // ====================== ECHTER ESP32 ======================
+    Serial.print("→ Hardware: Verbinde mit WiFi: ");
     Serial.println(ssid);
+    WiFi.begin(ssid, password);
+#endif
+
+    Serial.print("Warte auf Verbindung");
 
     int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 25) {
+    const int maxAttempts = 40;                 // mehr Versuche in Simulation sinnvoll
+
+    while (WiFi.status() != WL_CONNECTED && attempts < maxAttempts) {
         delay(500);
         Serial.print(".");
         attempts++;
     }
 
     if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("\nWiFi verbunden!");
-        Serial.print("IP: ");
+        Serial.println("\r\n✓ WiFi verbunden!");
+        Serial.print("   IP: ");
         Serial.println(WiFi.localIP());
+        Serial.print("   SSID: ");
+        Serial.println(WiFi.SSID());
 
         deviceID = WiFi.macAddress();
-        //deviceID.replace(":", "");
-        Serial.printf("Geräte-ID: %s\n", deviceID.c_str());
+        Serial.printf("   Geräte-ID: %s\r\n", deviceID.c_str());
+
         return true;
     } 
 
-    Serial.println("\nWiFi-Verbindung fehlgeschlagen!");
+    Serial.println("\r\n✗ WiFi-Verbindung fehlgeschlagen!");
+    Serial.printf("   Letzter Status: %d\r\n", WiFi.status());
     return false;
 }
-
 // ... (sendData und andere Funktionen bleiben gleich wie vorher)
 
 bool SupabaseClient::sendData(
@@ -81,13 +94,13 @@ bool SupabaseClient::sendData(
 
     if (httpResponseCode > 0) {
         String response = http.getString();
-        Serial.printf("Erfolg! Code: %d\n", httpResponseCode);
+        Serial.printf("Erfolg! Code: %d\r\n", httpResponseCode);
         if (response.length() > 0) Serial.println("Antwort: " + response);
         http.end();
         return true;
     } 
     else {
-        Serial.printf("Fehler beim Senden: %d\n", httpResponseCode);
+        Serial.printf("Fehler beim Senden: %d\r\n", httpResponseCode);
         String errorResponse = http.getString();
         if (errorResponse.length() > 0) {
             Serial.println("Supabase Fehlermeldung: " + errorResponse);
