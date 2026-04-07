@@ -2,6 +2,7 @@
 //#include "inmp441_mic.h"
 #include "inmp441_mic.h"  
 #include "ir_obstacle.h"
+#include "aht20_bmp280.h"
 #include "myUtils.h"
 #include "supabase_client.h"
 #include "data_buffer.h"
@@ -9,9 +10,12 @@
 //INMP441Mic mic;
 INMP441Mic mic;
 IRObstacle irSensor(26);
+AHT20_BMP280 aht20_bmp280;
 MyUtils utils;
 SupabaseClient supabase;
 DataBuffer dataBuffer;
+
+
 
 // WiFi Zugangsdaten 
 const char* WIFI_SSID = "A1_19FC_Rudolf";
@@ -38,8 +42,14 @@ void setup() {
 
     utils.printDeviceInfo();
 
+    if (!aht20_bmp280.begin()) {
+        Serial.println("Sensor-Initialisierung fehlgeschlagen!");
+        while (1) delay(10);   // Stopp bei Fehler
+    }
+
     mic.begin();
     irSensor.begin();
+    aht20_bmp280.begin();
 
     if (supabase.begin(WIFI_SSID, WIFI_PASS)) {
         Serial.println("Supabase-Client bereit.");
@@ -76,6 +86,8 @@ void loop() {
     }
     mic.update();
     irSensor.update();
+    aht20_bmp280.update();
+    aht20_bmp280.printValues();
 
     unsigned long now = millis();
 
@@ -121,4 +133,13 @@ void loop() {
     }
 
     delay(10);
+}
+
+
+
+void loop() {
+    aht20_bmp280.update();
+    aht20_bmp280.printValues();
+
+    delay(2000);   // alle 2 Sekunden aktualisieren
 }
