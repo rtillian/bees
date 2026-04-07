@@ -97,17 +97,12 @@ void loop() {
         float freq = mic.getDominantFrequency();
         long countIn = irSensor.getCountIn();      // <-- neu
         long countOut = irSensor.getCountOut();    // <-- neu
-
-        float temperature = 0.0;   // später mit Sensor füllen
-        float humidity = 0.0;      // später mit Sensor füllen
-        float co2 = 0.0;           // später mit Sensor füllen
-        float frequency = 0.0;   // später mit Sensor füllen
-        unsigned long beeCountIn = 5;   // später mit Sensor füllen
-        unsigned long beeCountOut = 5;   // später mit Sensor füllen
-
+        float co2 = 23.3;
+        
         SensorValues werte = aht20_bmp280.hole_werte();     // Hier wird die Funktion aufgerufen
 
         // Ausgabe in main.cpp
+        /* 
         Serial.println("=== Sensor Werte ===");
         Serial.printf("Temperatur AHT20 : %.2f °C\n", werte.tempAHT);
         Serial.printf("Luftfeuchtigkeit : %.2f %% \n", werte.humidity);
@@ -115,7 +110,7 @@ void loop() {
         Serial.printf("Luftdruck        : %.2f hPa\n", werte.pressure);
         Serial.printf("Höhe (ca.)       : %.1f m\n", werte.altitude);
         Serial.println("=============================");
-
+        */
 
         Serial.printf("📊 %5.1f dB    |    ♪ %6.0f Hz    |    In: %ld  Out: %ld\r\n", 
                       dB, freq, countIn, countOut);
@@ -126,11 +121,14 @@ void loop() {
         dataBuffer.addData(
             "abc",
             3, 
-            temperature, 
-            humidity, 
-            co2, 
+            werte.tempAHT, 
+            werte.tempBMP, 
+            werte.humidity, 
+            werte.pressure,
+            werte.altitude,
             dB, 
-            frequency, 
+            freq, 
+            co2,
             countIn, 
             countOut
         );

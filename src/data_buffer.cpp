@@ -6,11 +6,14 @@ DataBuffer::DataBuffer() {}
 void DataBuffer::addData(
         String beeStation, 
         long boxNumber, 
-        float temperature, 
+        float tempAHT, 
+        float tempBMP,
         float humidity, 
-        float co2, 
-        float db, 
+        float airPressure,
+        float seaLevel,
+        float volume,
         long frequency,
+        float co2, 
         unsigned long beeCountIn, 
         unsigned long beeCountOut 
 ) 
@@ -24,13 +27,16 @@ void DataBuffer::addData(
         recordCount = MAX_RECORDS - 1;
     }
 
-    records[recordCount].db = db;
+    records[recordCount].tempAHT = tempAHT;
+    records[recordCount].tempBMP = tempBMP;
+    records[recordCount].humidity = humidity;
+    records[recordCount].airPressure = airPressure;
+    records[recordCount].seaLevel = seaLevel;
+    records[recordCount].volume = volume;
     records[recordCount].frequency = frequency;
+    records[recordCount].co2 = co2;
     records[recordCount].beeCountIn = beeCountIn;
     records[recordCount].beeCountOut = beeCountOut;
-    records[recordCount].temperature = temperature;
-    records[recordCount].humidity = humidity;
-    records[recordCount].co2 = co2;
     records[recordCount].timestamp = millis();
 
     recordCount++;

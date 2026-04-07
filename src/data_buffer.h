@@ -7,11 +7,14 @@
 struct SensorRecord {
     String beeStation;
     long boxNumber;
-    float temperature; 
+    float tempAHT; 
+    float tempBMP;
     float humidity;
-    float co2;
-    float db;
+    float airPressure;
+    float seaLevel;
+    float volume;
     long frequency;
+    float co2;
     unsigned long beeCountIn; 
     unsigned long beeCountOut; 
     unsigned long timestamp;
@@ -23,11 +26,14 @@ public:
     void addData(
         String beeStation, 
         long boxNumber, 
-        float temperature, 
+        float tempAHT, 
+        float tempBMP,
         float humidity, 
-        float co2, 
-        float db, 
+        float airPressure,
+        float seaLevel,
+        float volume, 
         long frequency,
+        float co2,
         unsigned long beeCountIn, 
         unsigned long beeCountOut 
     );
