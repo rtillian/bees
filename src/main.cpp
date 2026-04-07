@@ -47,8 +47,8 @@ void setup() {
         while (1) delay(10);   // Stopp bei Fehler
     }
 
-    mic.begin();
-    irSensor.begin();
+    //mic.begin();
+    //irSensor.begin();
     aht20_bmp280.begin();
 
     if (supabase.begin(WIFI_SSID, WIFI_PASS)) {
@@ -84,8 +84,8 @@ void loop() {
         delay(100);          // kleine Pause, damit der ESP32 nicht den Watchdog triggert
         return;             // überspringt den Rest des loop()
     }
-    mic.update();
-    irSensor.update();
+    //mic.update();
+    //irSensor.update();
     aht20_bmp280.update();
     aht20_bmp280.printValues();
 
@@ -133,13 +133,4 @@ void loop() {
     }
 
     delay(10);
-}
-
-
-
-void loop() {
-    aht20_bmp280.update();
-    aht20_bmp280.printValues();
-
-    delay(2000);   // alle 2 Sekunden aktualisieren
 }
