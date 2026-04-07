@@ -37,7 +37,7 @@ void DataBuffer::addData(
     records[recordCount].co2 = co2;
     records[recordCount].beeCountIn = beeCountIn;
     records[recordCount].beeCountOut = beeCountOut;
-    records[recordCount].timestamp = millis();
+    //records[recordCount].timestamp = millis();
 
     recordCount++;
 }
@@ -64,13 +64,16 @@ bool DataBuffer::uploadBuffer(SupabaseClient& supabase) {
  
                 records[i].beeStation,
                 records[i].boxNumber,
-                records[i].temperature,
+                records[i].tempAHT,
+                records[i].tempBMP,
                 records[i].humidity,
-                records[i].co2,
-                records[i].db,
+                records[i].airPressure,
+                records[i].seaLevel,
+                records[i].volume,
                 records[i].frequency,
-                beeCountIn,
-                beeCountOut
+                records[i].co2,
+                records[i].beeCountIn,
+                records[i].beeCountOut
             )
             ) {    // aus der Station-Info
             success = false;

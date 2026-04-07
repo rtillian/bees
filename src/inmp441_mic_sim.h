@@ -14,12 +14,12 @@ public:
 
     bool isNewLoudnessReady() const;        // alle 2 Sekunden
     bool isNewFrequencyReady() const;       // alle 5 Sekunden
-    float getAverage_dB() const;
+    float getAverage_volume() const;
     float getDominantFrequency() const;
 
 private:
     float calculateRMS(const int32_t* samples, size_t count);
-    float convertTo_dB(float rms) const;
+    float convertTo_volume(float rms) const;
 
     // I2S
     static constexpr int BUFFER_SIZE = 512;     // Größer für gute FFT

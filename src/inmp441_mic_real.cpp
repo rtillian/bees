@@ -114,9 +114,9 @@ bool INMP441Mic::isNewFrequencyReady() const {
     return (millis() - lastFrequencyTime >= FREQUENCY_INTERVAL);
 }
 
-float INMP441Mic::getAverage_dB() const {
+float INMP441Mic::getAverage_volume() const {
     float avgRMS = (volumeCount > 0) ? (sumVolume / volumeCount) : 0.0;
-    return convertTo_dB(avgRMS);
+    return convertTo_volume(avgRMS);
 }
 
 float INMP441Mic::getDominantFrequency() const {
@@ -133,6 +133,6 @@ float INMP441Mic::calculateRMS(const int32_t* samples, size_t count) {
     return sqrt(sum / count);
 }
 
-float INMP441Mic::convertTo_dB(float rms) const {
+float INMP441Mic::convertTo_volume(float rms) const {
     return 20 * log10(rms / 1.2 + 1.0);
 }

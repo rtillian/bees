@@ -14,7 +14,7 @@ public:
 
     bool isNewLoudnessReady() const;        // alle 2 Sekunden
     bool isNewFrequencyReady() const;       // alle 5 Sekunden
-    float getAverage_dB() const;
+    float getAverage_volume() const;
     float getDominantFrequency() const;
 
 private:

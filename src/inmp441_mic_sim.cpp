@@ -34,10 +34,10 @@ bool INMP441Mic_sim::isNewFrequencyReady() const {
     return (millis() - lastFrequencyTime >= FREQUENCY_INTERVAL);
 }
 
-float INMP441Mic_sim::getAverage_dB() const {
+float INMP441Mic_sim::getAverage_volume() const {
     float avgRMS = 13.2; //(volumeCount > 0) ? (sumVolume / volumeCount) : 0.0;
-    Serial.println("getAverageDb");
-    return convertTo_dB(avgRMS);
+    Serial.println("getAveragevolume");
+    return convertTo_volume(avgRMS);
 }
 
 float INMP441Mic_sim::getDominantFrequency() const {
@@ -50,8 +50,8 @@ float INMP441Mic_sim::calculateRMS(const int32_t* samples, size_t count) {
     return 32.2;
 }
 
-float INMP441Mic_sim::convertTo_dB(float rms) const {
-    Serial.println("convertTo_dB");
+float INMP441Mic_sim::convertTo_volume(float rms) const {
+    Serial.println("convertTo_volume");
     return 66.2;
 
 }

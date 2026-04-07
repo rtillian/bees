@@ -17,7 +17,6 @@ struct SensorRecord {
     float co2;
     unsigned long beeCountIn; 
     unsigned long beeCountOut; 
-    unsigned long timestamp;
 };
 
 class DataBuffer {

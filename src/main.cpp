@@ -93,12 +93,12 @@ void loop() {
 
     // Lokale Anzeige alle 5 Sekunden
     if (now - lastPrintTime >= 5000) {
-        float dB = mic.getAverage_dB();
+        float volume = mic.getAverage_volume();
         float freq = mic.getDominantFrequency();
         long countIn = irSensor.getCountIn();      // <-- neu
         long countOut = irSensor.getCountOut();    // <-- neu
         float co2 = 23.3;
-        
+
         SensorValues werte = aht20_bmp280.hole_werte();     // Hier wird die Funktion aufgerufen
 
         // Ausgabe in main.cpp
@@ -112,8 +112,8 @@ void loop() {
         Serial.println("=============================");
         */
 
-        Serial.printf("📊 %5.1f dB    |    ♪ %6.0f Hz    |    In: %ld  Out: %ld\r\n", 
-                      dB, freq, countIn, countOut);
+        Serial.printf("📊 %5.1f volume    |    ♪ %6.0f Hz    |    In: %ld  Out: %ld\r\n", 
+                      volume, freq, countIn, countOut);
         Serial.printf("📊 %.2f A-Temp|    ♪ %.2f Hum.  |    %.2f B-Temp | %.2f Bar | %.2f Height\r\n", 
                       werte.tempAHT, werte.humidity, werte.tempBMP, werte.pressure,werte.altitude);
 
@@ -126,7 +126,7 @@ void loop() {
             werte.humidity, 
             werte.pressure,
             werte.altitude,
-            dB, 
+            volume, 
             freq, 
             co2,
             countIn, 

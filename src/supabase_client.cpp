@@ -49,11 +49,14 @@ bool SupabaseClient::begin(const char* ssid, const char* password) {
 bool SupabaseClient::sendData(
         String beeStation, 
         long boxNumber, 
-        float temperature, 
+        float tempAHT, 
+        float tempBMP, 
         float humidity, 
+        float airPressure,
+        float seaLevel,
+        float volume,
+        long  frequency,
         float co2, 
-        float db, 
-        long frequency,
         unsigned long beeCountIn, 
         unsigned long beeCountOut 
 ) {
@@ -69,8 +72,13 @@ bool SupabaseClient::sendData(
     JsonDocument doc;
     doc["bee_station"]    = beeStation;        // aus DataBuffer
     doc["box_number"]     = boxNumber;         // aus DataBuffer
-    doc["temperature"]    = temperature;
+    doc["temp_aht20"]     = tempAHT;
+    doc["temp_bmp280"]    = tempBMP;
     doc["humidity"]       = humidity;
+    doc["air_pressure"]   = airPressure;
+    doc["sea_level"]      = seaLevel;
+    doc["volume"]         = volume;
+    doc["frequency"]      = frequency;
     doc["co2"]            = co2;
     doc["bee_count_in"]   = beeCountIn;
     doc["bee_count_out"]  = beeCountOut;
