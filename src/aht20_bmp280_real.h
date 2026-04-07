@@ -1,4 +1,3 @@
-// aht20_bmp280.h
 #pragma once
 
 #include <Arduino.h>
@@ -6,33 +5,30 @@
 #include <Adafruit_AHTX0.h>
 #include <Adafruit_BMP280.h>
 
+// Struktur für alle Sensorwerte
+struct SensorValues {
+    float tempAHT;      // Temperatur AHT20
+    float humidity;     // Luftfeuchtigkeit
+    float tempBMP;      // Temperatur BMP280
+    float pressure;     // Luftdruck in hPa
+    float altitude;     // Höhe in Metern
+};
+
 class AHT20_BMP280 {
 private:
     Adafruit_AHTX0 aht;
     Adafruit_BMP280 bmp;
 
-    // Gemessene Werte
-    float temperatureAHT = 0.0;
-    float humidity = 0.0;
-    float temperatureBMP = 0.0;
-    float pressure = 0.0;
-    float altitude = 0.0;
-
     bool initialized = false;
 
 public:
-    AHT20_BMP280();                    // Konstruktor
+    AHT20_BMP280();
+    bool update();
+    bool begin();                    // Initialisierung
+    SensorValues hole_werte();       // Liest Sensoren aus und gibt alle Werte zurück
 
-    bool begin();                      // Initialisierung (I²C + Sensoren)
-    bool update();                     // Neue Werte von Sensoren lesen
-
-    // Getter-Methoden für die Werte
+    // Einzelne Getter (falls du sie später trotzdem brauchst)
     float getTemperatureAHT() const;
     float getHumidity() const;
-    float getTemperatureBMP() const;
-    float getPressure() const;         // in hPa
-    float getAltitude() const;         // in Metern (bezogen auf 1013.25 hPa)
-
-    // Zusätzliche praktische Methode
-    void printValues() const;          // Ausgabe aller Werte auf Serial
+    // ... weitere Getter bei Bedarf
 };

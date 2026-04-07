@@ -86,8 +86,8 @@ void loop() {
     }
     //mic.update();
     //irSensor.update();
-    aht20_bmp280.update();
-    aht20_bmp280.printValues();
+    //aht20_bmp280.update();
+    //aht20_bmp280.printValues();
 
     unsigned long now = millis();
 
@@ -105,9 +105,22 @@ void loop() {
         unsigned long beeCountIn = 5;   // später mit Sensor füllen
         unsigned long beeCountOut = 5;   // später mit Sensor füllen
 
+        SensorValues werte = aht20_bmp280.hole_werte();     // Hier wird die Funktion aufgerufen
+
+        // Ausgabe in main.cpp
+        Serial.println("=== Sensor Werte ===");
+        Serial.printf("Temperatur AHT20 : %.2f °C\n", werte.tempAHT);
+        Serial.printf("Luftfeuchtigkeit : %.2f %% \n", werte.humidity);
+        Serial.printf("Temperatur BMP280: %.2f °C\n", werte.tempBMP);
+        Serial.printf("Luftdruck        : %.2f hPa\n", werte.pressure);
+        Serial.printf("Höhe (ca.)       : %.1f m\n", werte.altitude);
+        Serial.println("=============================");
+
 
         Serial.printf("📊 %5.1f dB    |    ♪ %6.0f Hz    |    In: %ld  Out: %ld\r\n", 
                       dB, freq, countIn, countOut);
+        Serial.printf("📊 %.2f A-Temp|    ♪ %.2f Hum.  |    %.2f B-Temp | %.2f Bar | %.2f Height\r\n", 
+                      werte.tempAHT, werte.humidity, werte.tempBMP, werte.pressure,werte.altitude);
 
         // Daten in den Puffer speichern
         dataBuffer.addData(
@@ -132,5 +145,5 @@ void loop() {
         lastUploadTime = now;
     }
 
-    delay(10);
+    delay(100);
 }
