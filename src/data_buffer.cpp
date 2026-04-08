@@ -53,7 +53,7 @@ bool DataBuffer::uploadBuffer(SupabaseClient& supabase) {
         stationInfoLoaded = checkAndLoadStationInfo(supabase);
     }
 
-    Serial.printf("Sende %d Datensätze an Supabase (sensor_data)...\n", recordCount);
+    Serial.printf("Sende %d Datensätze an Supabase (sensor_data)...\r\n", recordCount);
 
     bool success = true;
     String beeStation = "abc";

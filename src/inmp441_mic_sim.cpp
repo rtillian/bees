@@ -9,7 +9,6 @@ bool INMP441Mic_sim::begin() {
     lastLoudnessTime = millis();
     lastFrequencyTime = millis();
 
-    Serial.println("INMP441 bereit.\n");
     return true;
 }
 
@@ -25,33 +24,26 @@ void INMP441Mic_sim::update() {
 }
 
 bool INMP441Mic_sim::isNewLoudnessReady() const {
-    Serial.println("isNewLoudnessReady");
     return (millis() - lastLoudnessTime >= LOUDNESS_INTERVAL);
 }
 
 bool INMP441Mic_sim::isNewFrequencyReady() const {
-    Serial.println("isNewFrequeceReady");
     return (millis() - lastFrequencyTime >= FREQUENCY_INTERVAL);
 }
 
 float INMP441Mic_sim::getAverage_volume() const {
     float avgRMS = 13.2; //(volumeCount > 0) ? (sumVolume / volumeCount) : 0.0;
-    Serial.println("getAveragevolume");
     return 22.2;
 }
 
 float INMP441Mic_sim::getDominantFrequency() const {
-    Serial.println("getDominantFrequency");
     return 33;
 }
 
 float INMP441Mic_sim::calculateRMS(const int32_t* samples, size_t count) {
-    Serial.println("calculateRMS");
     return 32.2;
 }
 
 float INMP441Mic_sim::convertTo_volume(float rms) const {
-    Serial.println("convertTo_volume");
     return 66.2;
-
 }

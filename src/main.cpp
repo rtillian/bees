@@ -1,11 +1,11 @@
 #include <Arduino.h>
-//#include "inmp441_mic.h"
 #include "inmp441_mic.h"  
 #include "ir_obstacle.h"
 #include "aht20_bmp280.h"
 #include "myUtils.h"
 #include "supabase_client.h"
 #include "data_buffer.h"
+#include "hx711.h"
 
 //INMP441Mic mic;
 INMP441Mic mic;
@@ -14,6 +14,7 @@ AHT20_BMP280 aht20_bmp280;
 MyUtils utils;
 SupabaseClient supabase;
 DataBuffer dataBuffer;
+
 
 // WiFi Zugangsdaten 
 const char* WIFI_SSID = "A1_19FC_Rudolf";
