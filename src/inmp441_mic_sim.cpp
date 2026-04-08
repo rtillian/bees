@@ -37,12 +37,12 @@ bool INMP441Mic_sim::isNewFrequencyReady() const {
 float INMP441Mic_sim::getAverage_volume() const {
     float avgRMS = 13.2; //(volumeCount > 0) ? (sumVolume / volumeCount) : 0.0;
     Serial.println("getAveragevolume");
-    return convertTo_volume(avgRMS);
+    return 22.2;
 }
 
 float INMP441Mic_sim::getDominantFrequency() const {
     Serial.println("getDominantFrequency");
-    return lastDominantFreq;
+    return 33;
 }
 
 float INMP441Mic_sim::calculateRMS(const int32_t* samples, size_t count) {

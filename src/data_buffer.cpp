@@ -98,7 +98,6 @@ bool DataBuffer::checkAndLoadStationInfo(SupabaseClient& supabase) {
         Serial.println("Keine WiFi-Verbindung für Stations-Abfrage.");
         return false;
     }
-
     HTTPClient http;
     String url = String(supabase.supabaseURL) + "/rest/v1/locations";
     url += "?select=bee_location,box_number";
@@ -109,10 +108,11 @@ bool DataBuffer::checkAndLoadStationInfo(SupabaseClient& supabase) {
     http.addHeader("Authorization", "Bearer " + String(supabase.anonKey));
 
     int httpCode = http.GET();
+    Serial.printf("Responce - httpCode: %d: ", httpCode);
 
     if (httpCode == 200) {
         String payload = http.getString();
-        Serial.println("Station-Info erhalten: " + payload);
+        Serial.println("Station-Info gained: " + payload);
 
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, payload);
@@ -123,18 +123,24 @@ bool DataBuffer::checkAndLoadStationInfo(SupabaseClient& supabase) {
             beeStation = row["bee_location"] | "";
             boxNumber  = row["box_number"] | 0;
 
-            Serial.printf("→ Bee Location: %s\n", beeStation.c_str());
-            Serial.printf("→ Box Number : %d\n", boxNumber);
+            Serial.printf("→ Bee Location: %s\r\n", beeStation.c_str());
+            Serial.printf("→ Box Number : %d\r\n", boxNumber);
 
             http.end();
             return true;
         } 
         else {
-            Serial.println("JSON-Parsing fehlgeschlagen oder keine Daten gefunden.");
+            Serial.println("JSON-Parsing went wrong - no data found");
         }
     } 
     else if (httpCode == 404 || httpCode == 406) {
-        Serial.println("MAC-Adresse nicht in Tabelle 'locations' gefunden.");
+        Serial.println("MAC-Address in table locations not found.");
+    } else {
+        Serial.println("Error");
+        String errorPayload = http.getString();
+        Serial.printf("httpCode %d: ", httpCode);
+        Serial.println(errorPayload);
+      
     }
     return false;
 }

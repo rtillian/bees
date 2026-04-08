@@ -23,7 +23,6 @@ private:
 
 public:
     AHT20_BMP280();
-    bool update();
     bool begin();                    // Initialisierung
     SensorValues hole_werte();       // Liest Sensoren aus und gibt alle Werte zurück
 

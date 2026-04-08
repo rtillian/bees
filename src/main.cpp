@@ -15,8 +15,6 @@ MyUtils utils;
 SupabaseClient supabase;
 DataBuffer dataBuffer;
 
-
-
 // WiFi Zugangsdaten 
 const char* WIFI_SSID = "A1_19FC_Rudolf";
 const char* WIFI_PASS = "till3333";
@@ -49,7 +47,7 @@ void setup() {
 
     //mic.begin();
     //irSensor.begin();
-    aht20_bmp280.begin();
+    //aht20_bmp280.begin();
 
     if (supabase.begin(WIFI_SSID, WIFI_PASS)) {
         Serial.println("Supabase-Client bereit.");
@@ -84,9 +82,8 @@ void loop() {
         delay(100);          // kleine Pause, damit der ESP32 nicht den Watchdog triggert
         return;             // überspringt den Rest des loop()
     }
-    //mic.update();
-    //irSensor.update();
-    //aht20_bmp280.update();
+    mic.update();
+    irSensor.update();
     //aht20_bmp280.printValues();
 
     unsigned long now = millis();
@@ -94,10 +91,15 @@ void loop() {
     // Lokale Anzeige alle 5 Sekunden
     if (now - lastPrintTime >= 5000) {
         float volume = mic.getAverage_volume();
+
         float freq = mic.getDominantFrequency();
+
         long countIn = irSensor.getCountIn();      // <-- neu
+
         long countOut = irSensor.getCountOut();    // <-- neu
+
         float co2 = 23.3;
+
 
         SensorValues werte = aht20_bmp280.hole_werte();     // Hier wird die Funktion aufgerufen
 
