@@ -2,11 +2,11 @@
 #pragma once
 
 #include <Arduino.h>
-#include <HX711.h>         
+#include <HX711.h>
 
 class HX711_Scale {
 private:
-    HX711_Scale scale;
+    HX711 scale;
     
     const int DT_PIN  = 16;
     const int SCK_PIN = 17;

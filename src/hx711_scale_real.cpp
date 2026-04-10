@@ -1,26 +1,36 @@
 // hx711_real.cpp
-#include "hx711_real.h"
+#include "hx711_scale_real.h"
 
 HX711_Scale::HX711_Scale() {
     // Konstruktor
 }
 
 bool HX711_Scale::begin() {
-    Serial.println("Initialisiere HX711 Load Cell...");
-
-    scale.begin(DT_PIN, SCK_PIN);
+    Serial.println("=== HX711 Initialisierung ===");
+    Serial.print("DT  (GPIO) = "); Serial.println(DT_PIN);
+    Serial.print("SCK (GPIO) = "); Serial.println(SCK_PIN);
     
-    // Warte kurz bis der HX711 bereit ist
+    scale.begin(DT_PIN, SCK_PIN);
+
+    // Warte etwas länger
+    delay(100);
+
     if (scale.is_ready()) {
+        Serial.println("HX711 gefunden und bereit!");
         scale.set_scale(calibration_factor);
-        scale.tare();                    // Automatisches Tara beim Start
+        scale.tare();
         initialized = true;
-        
-        Serial.println("HX711 erfolgreich initialisiert und getared.");
         return true;
     } else {
-        Serial.println("Fehler: HX711 nicht gefunden!");
-        return false;
+        Serial.println("FEHLER: HX711 nicht gefunden / nicht bereit!");
+        Serial.println("Mögliche Ursachen:");
+        Serial.println("  - VCC nicht auf 5V (sondern 3.3V)?");
+        Serial.println("  - DT oder SCK falsch verdrahtet?");
+        Serial.println("  - GND nicht richtig verbunden?");
+        Serial.println("  - Load Cell nicht angeschlossen?");
+        Serial.println("  - HX711 Modul defekt?");
+        initialized = false;
+        return false; 
     }
 }
 

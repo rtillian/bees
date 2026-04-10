@@ -5,7 +5,7 @@
 #include "myUtils.h"
 #include "supabase_client.h"
 #include "data_buffer.h"
-#include "hx711.h"
+#include "hx711_scale.h"
 
 //INMP441Mic mic;
 INMP441Mic mic;
@@ -14,6 +14,7 @@ AHT20_BMP280 aht20_bmp280;
 MyUtils utils;
 SupabaseClient supabase;
 DataBuffer dataBuffer;
+HX711_Scale hx711_Scale;
 
 
 // WiFi Zugangsdaten 
@@ -33,7 +34,7 @@ void setup() {
     #else
         Serial.println("→ INMP441 läuft mit echter Hardware");
     #endif
-    delay(5000);
+    delay(1000);
     
     Serial.println("\n========================================");
     Serial.println("   INMP441 + IR Bienenzähler + Supabase");
@@ -45,6 +46,14 @@ void setup() {
         Serial.println("Sensor-Initialisierung fehlgeschlagen!");
         while (1) delay(10);   // Stopp bei Fehler
     }
+
+    if (!hx711_Scale.begin()) {
+        Serial.println("Fehler bei der Initialisierung der Waage!");
+        while (1) delay(10);   // Stopp bei Fehler
+    }
+
+    Serial.println("Waage ist bereit.");
+    Serial.println("Lege Gewicht auf die Load Cell...");
 
     //mic.begin();
     //irSensor.begin();
@@ -103,6 +112,9 @@ void loop() {
 
 
         SensorValues werte = aht20_bmp280.hole_werte();     // Hier wird die Funktion aufgerufen
+
+        float gewicht = hx711_Scale.measure_weight();
+        Serial.printf("Gewicht: %.2f Gramm\r\n", gewicht );
 
         // Ausgabe in main.cpp
         /* 
