@@ -14,6 +14,7 @@ void DataBuffer::addData(
         float volume,
         long frequency,
         float co2, 
+        float weight,
         unsigned long beeCountIn, 
         unsigned long beeCountOut 
 ) 
@@ -35,6 +36,7 @@ void DataBuffer::addData(
     records[recordCount].volume = volume;
     records[recordCount].frequency = frequency;
     records[recordCount].co2 = co2;
+    records[recordCount].weight = weight;
     records[recordCount].beeCountIn = beeCountIn;
     records[recordCount].beeCountOut = beeCountOut;
     //records[recordCount].timestamp = millis();
@@ -72,6 +74,7 @@ bool DataBuffer::uploadBuffer(SupabaseClient& supabase) {
                 records[i].volume,
                 records[i].frequency,
                 records[i].co2,
+                records[i].weight,
                 records[i].beeCountIn,
                 records[i].beeCountOut
             )
@@ -101,14 +104,16 @@ bool DataBuffer::checkAndLoadStationInfo(SupabaseClient& supabase) {
     HTTPClient http;
     String url = String(supabase.supabaseURL) + "/rest/v1/locations";
     url += "?select=bee_location,box_number";
-    url += "&mac_address=eq." + supabase.deviceID;
+    url += "&mac_address=eq.1C:69:20:EA:47:68" ; //+ supabase.deviceID;
 
+    Serial.printf("URL for info from tabel locations: %s\r\n", url.c_str());
     http.begin(url);
     http.addHeader("apikey", supabase.anonKey);
     http.addHeader("Authorization", "Bearer " + String(supabase.anonKey));
 
     int httpCode = http.GET();
     Serial.printf("Responce - httpCode: %d: ", httpCode);
+    delay( 3000 );
 
     if (httpCode == 200) {
         String payload = http.getString();
@@ -121,7 +126,7 @@ bool DataBuffer::checkAndLoadStationInfo(SupabaseClient& supabase) {
             JsonObject row = doc[0];
 
             beeStation = row["bee_location"] | "";
-            boxNumber  = row["box_number"] | 0;
+            boxNumber  = row["box_number"].as<int>() | 0;
 
             Serial.printf("→ Bee Location: %s\r\n", beeStation.c_str());
             Serial.printf("→ Box Number : %d\r\n", boxNumber);

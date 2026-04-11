@@ -22,6 +22,7 @@ public:
         float volume,
         long frequency,
         float co2, 
+        float weight,
         unsigned long beeCountIn, 
         unsigned long beeCountOut 
     );

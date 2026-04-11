@@ -44,7 +44,6 @@ bool SupabaseClient::begin(const char* ssid, const char* password) {
     Serial.printf("   Letzter Status: %d\r\n", WiFi.status());
     return false;
 }
-// ... (sendData und andere Funktionen bleiben gleich wie vorher)
 
 bool SupabaseClient::sendData(
         String beeStation, 
@@ -57,6 +56,7 @@ bool SupabaseClient::sendData(
         float volume,
         long  frequency,
         float co2, 
+        float weight,
         unsigned long beeCountIn, 
         unsigned long beeCountOut 
 ) {
@@ -80,6 +80,7 @@ bool SupabaseClient::sendData(
     doc["volume"]         = volume;
     doc["frequency"]      = frequency;
     doc["co2"]            = co2;
+    doc["weight"]         = weight;
     doc["bee_count_in"]   = beeCountIn;
     doc["bee_count_out"]  = beeCountOut;
 

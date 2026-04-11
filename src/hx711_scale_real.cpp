@@ -10,10 +10,15 @@ bool HX711_Scale::begin() {
     Serial.print("DT  (GPIO) = "); Serial.println(DT_PIN);
     Serial.print("SCK (GPIO) = "); Serial.println(SCK_PIN);
     
+    pinMode(SCK_PIN, OUTPUT);
+    digitalWrite(SCK_PIN, HIGH);     // SCK auf HIGH
+    delayMicroseconds(100);                   // Mindestens 60µs für Reset
+    digitalWrite(SCK_PIN, LOW);      // SCK wieder LOW
+    delay(100);
     scale.begin(DT_PIN, SCK_PIN);
 
     // Warte etwas länger
-    delay(100);
+    delay(500);
 
     if (scale.is_ready()) {
         Serial.println("HX711 gefunden und bereit!");
@@ -42,8 +47,11 @@ float HX711_Scale::measure_weight() {
 
     if (scale.is_ready()) {
         // 10 Messungen mitteln für stabilere Werte
-        float weight = scale.get_units(10);
-        return weight;
+        long raw = scale.read_average(10);     // Rohwert
+        float gewicht = scale.get_units(10);
+
+        Serial.printf("Raw*********************************: %8ld   |   Gewicht: %6.2f g\n", raw, gewicht);
+        return gewicht;
     } else {
         Serial.println("HX711 nicht bereit...");
         return 0.0;

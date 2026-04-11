@@ -8,8 +8,8 @@ class HX711_Scale {
 private:
     HX711 scale;
     
-    const int DT_PIN  = 16;
-    const int SCK_PIN = 17;
+    const int DT_PIN  = 4;
+    const int SCK_PIN = 5;
     
     float calibration_factor = 1.0;
     bool initialized = false;

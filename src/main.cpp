@@ -113,8 +113,8 @@ void loop() {
 
         SensorValues werte = aht20_bmp280.hole_werte();     // Hier wird die Funktion aufgerufen
 
-        float gewicht = hx711_Scale.measure_weight();
-        Serial.printf("Gewicht: %.2f Gramm\r\n", gewicht );
+        float weight = hx711_Scale.measure_weight();
+        Serial.printf("Weight: %.2f Gramm\r\n", weight );
 
         // Ausgabe in main.cpp
         /* 
@@ -144,6 +144,7 @@ void loop() {
             volume, 
             freq, 
             co2,
+            weight, 
             countIn, 
             countOut
         );
